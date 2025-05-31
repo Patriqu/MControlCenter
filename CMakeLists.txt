@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.25)
 
 project(MControlCenter VERSION 0.4.1 LANGUAGES CXX)
 
@@ -8,11 +8,10 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Network)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools DBus Network)
+find_package(Qt6 6.4 REQUIRED COMPONENTS Widgets Network LinguistTools DBus)
 
 set(PROJECT_SOURCES
     src/main.cpp
@@ -37,8 +36,8 @@ set(TS_FILES
     MControlCenter_tr.ts
 )
 
-find_program(LUPDATE_EXECUTABLE lupdate lupdate-qt5 REQUIRED)
-find_program(LRELEASE_EXECUTABLE lrelease lrelease-qt5 REQUIRED)
+find_program(LUPDATE_EXECUTABLE lupdate lupdate6 lupdate-qt6 PATHS /lib/qt6/bin/ REQUIRED)
+find_program(LRELEASE_EXECUTABLE lrelease lrelease6 lrelease-qt6 PATHS /lib/qt6/bin/ REQUIRED)
 
 foreach(_ts_file ${TS_FILES})
     execute_process(COMMAND
@@ -55,7 +54,7 @@ foreach(_ts_file ${TS_FILES})
     )
 endforeach()
 
-if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
+if(Qt6_FOUND)
     qt_add_executable(mcontrolcenter
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
