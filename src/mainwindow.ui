@@ -771,6 +771,39 @@
              </widget>
             </item>
             <item row="1" column="0">
+              <layout class="QHBoxLayout" name="horizontalLayout_2">
+                <item>
+                  <widget class="QPushButton" name="pushButton_2">
+                    <property name="maximumSize">
+                      <size>
+                        <width>40</width>
+                        <height>16777215</height>
+                      </size>
+                    </property>
+                    <property name="text">
+                      <string>Add</string>
+                    </property>
+                  </widget>
+                </item>
+                <item>
+                  <widget class="QPushButton" name="pushButton">
+                    <property name="maximumSize">
+                      <size>
+                        <width>50</width>
+                        <height>16777215</height>
+                      </size>
+                    </property>
+                    <property name="text">
+                      <string>Remove</string>
+                    </property>
+                  </widget>
+                </item>
+                <item>
+                  <widget class="QComboBox" name="fanProfileComboBox"/>
+                </item>
+              </layout>
+            </item>
+            <item row="2" column="0">
              <widget class="QTabWidget" name="fanControlTabWidget">
               <property name="enabled">
                <bool>false</bool>
@@ -1553,7 +1586,7 @@
               </widget>
              </widget>
             </item>
-            <item row="2" column="0">
+            <item row="3" column="0">
              <layout class="QHBoxLayout" name="horizontalLayout">
               <item>
                <widget class="QPushButton" name="fanSpeedResetButton">
