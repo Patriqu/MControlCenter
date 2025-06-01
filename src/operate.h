@@ -70,6 +70,12 @@ public:
     [[nodiscard]] QVector<int> getFan2SpeedSettings() const;
     [[nodiscard]] QVector<int> getFan1TempSettings() const;
     [[nodiscard]] QVector<int> getFan2TempSettings() const;
+    [[nodiscard]] QString getCurrentFanProfile() const;
+
+    [[nodiscard]] QVector<int> getFan1SpeedSettingsForProfile() const;
+    [[nodiscard]] QVector<int> getFan2SpeedSettingsForProfile() const;
+    [[nodiscard]] QVector<int> getFan1TempSettingsForProfile() const;
+    [[nodiscard]] QVector<int> getFan2TempSettingsForProfile() const;
 
     [[nodiscard]] int getKeyboardBacklightMode() const;
     [[nodiscard]] int getKeyboardBrightness() const;

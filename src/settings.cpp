@@ -26,7 +26,24 @@ QVariant Settings::getValue(const QString &key) {
     return settings.value(key);
 }
 
-QVector<int> Settings::getValueVector(const QString &key) {
+QStringList Settings::getFanProfiles()
+{
+    QStringList groups = settings.childGroups();
+
+    QStringList fanProfilesGroups;
+    for (const QString &groupName : groups)
+    {
+        if (groupName.startsWith("Fan.", Qt::CaseInsensitive))
+        {
+            fanProfilesGroups.append(groupName.sliced(groupName.indexOf(".") + 1));
+        }
+    }
+
+    return fanProfilesGroups;
+}
+
+QVector<int> Settings::getValueVector(const QString &key)
+{
     QVector<int> value;
     std::stringstream string_stream(settings.value(key).toString().toStdString());
     while (string_stream.good()) {

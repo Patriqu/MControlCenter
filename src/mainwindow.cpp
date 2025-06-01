@@ -34,6 +34,13 @@ MainWindow::MainWindow(QWidget *parent)
         : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
 
+    Settings s;
+
+    // load fan profiles from configuration
+    ui->fanProfileComboBox->addItems(s.getFanProfiles());
+    ui->fanProfileComboBox->setCurrentText(operate.getCurrentFanProfile());
+
+    // add signals
     connect(ui->advancedFanControlCheckBox, &QCheckBox::toggled, this, &MainWindow::setFanModeAdvanced);
 
     connect(ui->fan1Speed1Slider, &QSlider::valueChanged, this, [this]() {
@@ -427,11 +434,20 @@ void MainWindow::updateFanMode() {
 void MainWindow::updateFanSpeedSettings() {
     ui->advancedFanControlCheckBox->setChecked(operate.getFanMode() == fan_mode::advanced_fan_mode);
 
-    QVector fan1SpeedSettings = operate.getFan1SpeedSettings();
-    QVector fan1TempSettings = operate.getFan1TempSettings();
-    QVector fan2SpeedSettings = operate.getFan2SpeedSettings();
-    QVector fan2TempSettings = operate.getFan2TempSettings();
+    QVector fan1SpeedSettings = operate.getFan1SpeedSettingsForProfile();
+    QVector fan1TempSettings = operate.getFan1TempSettingsForProfile();
+    QVector fan2SpeedSettings = operate.getFan2SpeedSettingsForProfile();
+    QVector fan2TempSettings = operate.getFan2TempSettingsForProfile();
 
+    updateFansSliders(fan1SpeedSettings, fan1TempSettings, fan2SpeedSettings, fan2TempSettings);
+
+    checkFanSettingsChanged();
+}
+
+void MainWindow::updateFansSliders(QVector<int> fan1SpeedSettings, QVector<int> fan1TempSettings,
+                                   QVector<int> fan2SpeedSettings, QVector<int> fan2TempSettings) const
+{
+    // fan1 speed sliders
     ui->fan1Speed1Slider->setValue(fan1SpeedSettings[0]);
     ui->fan1Speed2Slider->setValue(fan1SpeedSettings[1]);
     ui->fan1Speed3Slider->setValue(fan1SpeedSettings[2]);
@@ -440,6 +456,16 @@ void MainWindow::updateFanSpeedSettings() {
     ui->fan1Speed6Slider->setValue(fan1SpeedSettings[5]);
     ui->fan1Speed7Slider->setValue(fan1SpeedSettings[6]);
 
+    // fan1 speed labels
+    ui->fan1Speed1Label->setText(QString("%1%").arg(fan1SpeedSettings[0]));
+    ui->fan1Speed2Label->setText(QString("%1%").arg(fan1SpeedSettings[1]));
+    ui->fan1Speed3Label->setText(QString("%1%").arg(fan1SpeedSettings[2]));
+    ui->fan1Speed4Label->setText(QString("%1%").arg(fan1SpeedSettings[3]));
+    ui->fan1Speed5Label->setText(QString("%1%").arg(fan1SpeedSettings[4]));
+    ui->fan1Speed6Label->setText(QString("%1%").arg(fan1SpeedSettings[5]));
+    ui->fan1Speed7Label->setText(QString("%1%").arg(fan1SpeedSettings[6]));
+
+    // fan1 temperature spinboxes
     ui->fan1Speed1TempLabel->setText(QString("< %1 °C").arg(fan1TempSettings[0]));
     ui->fan1Speed2TempSpinBox->setValue(fan1TempSettings[0]);
     ui->fan1Speed3TempSpinBox->setValue(fan1TempSettings[1]);
@@ -448,6 +474,7 @@ void MainWindow::updateFanSpeedSettings() {
     ui->fan1Speed6TempSpinBox->setValue(fan1TempSettings[4]);
     ui->fan1Speed7TempSpinBox->setValue(fan1TempSettings[5]);
 
+    // fan2 speed sliders
     ui->fan2Speed1Slider->setValue(fan2SpeedSettings[0]);
     ui->fan2Speed2Slider->setValue(fan2SpeedSettings[1]);
     ui->fan2Speed3Slider->setValue(fan2SpeedSettings[2]);
@@ -456,6 +483,16 @@ void MainWindow::updateFanSpeedSettings() {
     ui->fan2Speed6Slider->setValue(fan2SpeedSettings[5]);
     ui->fan2Speed7Slider->setValue(fan2SpeedSettings[6]);
 
+    // fan2 speed labels
+    ui->fan2Speed1Label->setText(QString("%1%").arg(fan2SpeedSettings[0]));
+    ui->fan2Speed2Label->setText(QString("%1%").arg(fan2SpeedSettings[1]));
+    ui->fan2Speed3Label->setText(QString("%1%").arg(fan2SpeedSettings[2]));
+    ui->fan2Speed4Label->setText(QString("%1%").arg(fan2SpeedSettings[3]));
+    ui->fan2Speed5Label->setText(QString("%1%").arg(fan2SpeedSettings[4]));
+    ui->fan2Speed6Label->setText(QString("%1%").arg(fan2SpeedSettings[5]));
+    ui->fan2Speed7Label->setText(QString("%1%").arg(fan2SpeedSettings[6]));
+
+    // fan2 temperature spinboxes
     ui->fan2Speed1TempLabel->setText(QString("< %1 °C").arg(fan2TempSettings[0]));
     ui->fan2Speed2TempSpinBox->setValue(fan2TempSettings[0]);
     ui->fan2Speed3TempSpinBox->setValue(fan2TempSettings[1]);
@@ -463,8 +500,6 @@ void MainWindow::updateFanSpeedSettings() {
     ui->fan2Speed5TempSpinBox->setValue(fan2TempSettings[3]);
     ui->fan2Speed6TempSpinBox->setValue(fan2TempSettings[4]);
     ui->fan2Speed7TempSpinBox->setValue(fan2TempSettings[5]);
-
-    checkFanSettingsChanged();
 }
 
 void MainWindow::setBestMobility() {
@@ -562,7 +597,8 @@ QVector<int> MainWindow::getFan2TempValues() const {
     return fan2TempSettings;
 }
 
-void MainWindow::setFanSpeedSettings() {
+void MainWindow::setFanSpeedSettings() const
+{
     operate.setFan1SpeedSettings(getFan1SpeedValues());
     operate.setFan1TempSettings(getFan1TempValues());
     operate.setFan2SpeedSettings(getFan2SpeedValues());
@@ -694,6 +730,35 @@ void MainWindow::on_keyboardBrightnessSlider_valueChanged(int value) const {
     if (operate.updateEcData()) {
         updateKeyboardBrightness();
     }
+}
+
+void MainWindow::on_fanProfileComboBox_currentIndexChanged(int index) const
+{
+    QString currentFanProfile = ui->fanProfileComboBox->currentText();
+
+    qInfo() << "on_fanProfileComboBox_currentIndexChanged: " << currentFanProfile;
+
+    // todo: move this code to operate
+    Settings::setValue("Settings/currentFanProfile", currentFanProfile);
+
+    // update sliders with selected profile
+    QVector<int> fan1SpeedSettings = operate.getFan1SpeedSettingsForProfile();
+    QVector<int> fan1TempSettings = operate.getFan1TempSettingsForProfile();
+    QVector<int> fan2SpeedSettings = operate.getFan2SpeedSettingsForProfile();
+    QVector<int> fan2TempSettings = operate.getFan2TempSettingsForProfile();
+
+    qInfo() << "fan1SpeedSettings: " << QVariant::fromValue(fan1SpeedSettings);
+    qInfo() << "fan1TempSettings: " << QVariant::fromValue(fan1TempSettings);
+    qInfo() << "fan2SpeedSettings: " << QVariant::fromValue(fan2SpeedSettings);
+    qInfo() << "fan2TempSettings: " << QVariant::fromValue(fan2TempSettings);
+
+    updateFansSliders(fan1SpeedSettings, fan1TempSettings, fan2SpeedSettings, fan2TempSettings);
+
+    // disable buttons
+    ui->fanSpeedApplyButton->setEnabled(false);
+    ui->fanSpeedResetButton->setEnabled(false);
+
+    setFanSpeedSettings();
 }
 
 void MainWindow::on_keyboardBacklightModeComboBox_currentIndexChanged(int index) const {

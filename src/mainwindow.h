@@ -65,6 +65,8 @@ private:
     void updateUserMode();
     void updateFanMode();
     void updateFanSpeedSettings();
+    void updateFansSliders(QVector<int> fan1SpeedSettings, QVector<int> fan1TempSettings,
+                           QVector<int> fan2SpeedSettings, QVector<int> fan2TempSettings) const;
 
     void setBestMobility();
     void setBalancedBattery();
@@ -81,9 +83,10 @@ private:
     QVector<int> getFan2SpeedValues() const;
     QVector<int> getFan1TempValues() const;
     QVector<int> getFan2TempValues() const;
-    void setFanSpeedSettings();
+    void setFanSpeedSettings() const;
     void setFanModeAdvanced(bool enabled) const;
     void checkFanSettingsChanged() const;
+    void addFanProfile() const;
 
     void showEvent(QShowEvent *event);
     void closeEvent(QCloseEvent *event);
@@ -138,6 +141,7 @@ private slots:
 
     void on_keyboardBrightnessSlider_valueChanged(int value) const;
 
+    void on_fanProfileComboBox_currentIndexChanged(int index) const;
     void on_keyboardBacklightModeComboBox_currentIndexChanged(int index) const;
 
     void on_highPerformanceModeRadioButton_toggled(bool checked);

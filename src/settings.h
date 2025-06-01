@@ -25,6 +25,7 @@
 class Settings {
 public:
     QVariant getValue(const QString &key);
+    QStringList getFanProfiles();
     QVector<int> getValueVector(const QString &key);
     static void setValue(const QString &key, const QVariant &value);
     static void setValue(const QString &key, const QVector<int> &value);
